@@ -1,0 +1,35 @@
+import { z } from "zod";
+import { Permission, ToolCategory, type MCPTool } from "../../types";
+import { updateProduct } from "../../../services/product.service";
+import { loginDemoBackend, registerDemoBackend } from "../../../services/demo-auth.service";
+
+async function getServiceAccountToken() {
+  try {
+    const data = await loginDemoBackend({ username: "commandflow_orchestrator", password: "service_password" });
+    return data.token;
+  } catch {
+    await registerDemoBackend({ username: "commandflow_orchestrator", password: "service_password", role: "admin" });
+    const data = await loginDemoBackend({ username: "commandflow_orchestrator", password: "service_password" });
+    return data.token;
+  }
+}
+
+export function createUpdateStockTool(): MCPTool {
+  return {
+    name: "products.updateStock",
+    description: "Update the stock quantity of an existing product. You MUST provide the exact productId (e.g. PROD-001). If you only know the product name, you MUST call products.getProducts first to find the correct productId.",
+    category: ToolCategory.PRODUCTS,
+    permissions: [Permission.ADMIN],
+    inputSchema: z.object({
+      productId: z.string().min(1),
+      stock: z.number().int().min(0),
+    }),
+    async execute(input) {
+      const { productId, stock } = input as { productId: string; stock: number };
+      const token = await getServiceAccountToken();
+      
+      const updatedProduct = await updateProduct(productId, { stock }, token);
+      return updatedProduct;
+    },
+  };
+}
