@@ -1,13 +1,13 @@
 import { NextRequest } from "next/server";
 import { verifyToken } from "./jwt";
-import { UserRole } from "@prisma/client";
 import { UnauthorizedError } from "./errors";
 
 export interface AuthUser {
   id: string;
+  name: string;
   email: string;
-  role: UserRole;
   companyId: string;
+  role: string;
 }
 
 export function authenticate(req: NextRequest): AuthUser {

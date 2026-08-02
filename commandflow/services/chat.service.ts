@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { MessageRole, UserRole } from "@prisma/client";
 import { parseCommand } from "./command-parser.service";
 import { createCommandServer } from "./tool.service";
 import { Permission } from "@/mcp/types";
@@ -11,11 +10,11 @@ interface ChatRequest {
   companyId: string;
 }
 
-function toPermission(role: UserRole | string): Permission | string {
+function toPermission(role: string): Permission | string {
   switch (role) {
-    case UserRole.ADMIN:
+    case "ADMIN":
       return Permission.ADMIN;
-    case UserRole.MANAGER:
+    case "MANAGER":
       return Permission.MANAGER;
     default:
       return Permission.VIEWER;
@@ -89,7 +88,7 @@ export async function processChat(data: ChatRequest) {
   await prisma.message.create({
     data: {
       conversationId,
-      role: MessageRole.USER,
+      role: "USER",
       content: message,
     },
   });
@@ -122,7 +121,7 @@ export async function processChat(data: ChatRequest) {
   await prisma.message.create({
     data: {
       conversationId,
-      role: MessageRole.ASSISTANT,
+      role: "ASSISTANT",
       content: JSON.stringify(responsePayload),
     },
   });

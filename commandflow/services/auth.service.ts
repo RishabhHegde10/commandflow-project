@@ -2,8 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, comparePassword } from "@/lib/bcrypt";
 import { generateToken } from "@/lib/jwt";
 import { registerSchema, loginSchema } from "@/validators/auth.validator";
-import { UserRole } from "@prisma/client";
-
 function sanitizeUser(user: { [key: string]: unknown }) {
   const { password, ...rest } = user;
   return rest;
@@ -42,7 +40,7 @@ export async function registerUser(data: unknown) {
         name: validatedData.name,
         email: validatedData.email,
         password: hashedPassword,
-        role: UserRole.ADMIN,
+        role: "ADMIN",
         companyId: company.id,
       },
     });

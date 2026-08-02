@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { UserRole } from "@prisma/client";
 import { UnauthorizedError } from "./errors";
 
 function getJwtSecret(): string {
@@ -15,7 +14,7 @@ function getJwtSecret(): string {
 export interface JwtPayload {
   id: string;
   email: string;
-  role: UserRole;
+  role: string;
   companyId: string;
 }
 
@@ -32,7 +31,7 @@ export function verifyToken(token: string): JwtPayload {
     return {
       id: typeof verified.id === "string" ? verified.id : "",
       email: typeof verified.email === "string" ? verified.email : "",
-      role: (verified.role as JwtPayload["role"]) ?? UserRole.VIEWER,
+      role: typeof verified.role === "string" ? verified.role : "VIEWER",
       companyId: typeof verified.companyId === "string" ? verified.companyId : "",
     };
   } catch (error) {
